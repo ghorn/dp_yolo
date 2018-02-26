@@ -23,8 +23,8 @@ q_max =  y*np.pi
 w_min = -4.
 w_max =  4.
 
-u_min = -0.6
-u_max =  0.6
+u_min = -0.8
+u_max =  0.8
 
 qs = np.linspace(q_min, q_max, Nq)
 ws = np.linspace(w_min, w_max, Nw)

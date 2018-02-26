@@ -3,8 +3,21 @@
 import numpy as np
 import sys
 
+def _wrap_angle(q):
+    return np.remainder(q + np.pi, 2*np.pi) - np.pi
+
+def _ghetto_wrap_angle(q):
+    while q > np.pi:
+        q -= 2*np.pi
+    while q < -np.pi:
+        q += 2*np.pi
+    return q
+
+
 def _cost_function(x, u):
-    return 1 + 1e-4*(x[0]**2 + x[1]**2 + u**2)
+    return 1 + 1e-2*(_wrap_angle(x[0])**2 + x[1]**2 + u**2)
+#    height = np.cos(x[0]) - 1
+#    return 1 + 1e-2*(height**2 + x[1]**2 + 1e-6*u**2)
 
 
 # differential equation
@@ -27,17 +40,6 @@ def _rk4(x0, u, h):
     next_x = x0 + h/6. * (k1 + 2.*k2 + 2.*k3 + k4)
     cost = h/6. * (ck1 + 2.*ck2 + 2.*ck3 + ck4)
     return (next_x, cost)
-
-
-def _wrap_angle(q):
-    return np.remainder(q + np.pi, 2*np.pi) - np.pi
-
-def _ghetto_wrap_angle(q):
-    while q > np.pi:
-        q -= 2*np.pi
-    while q < -np.pi:
-        q += 2*np.pi
-    return q
 
 
 def integrate(x0, u, h):
