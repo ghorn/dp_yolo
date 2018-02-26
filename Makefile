@@ -6,5 +6,5 @@ state_transitions.pickle: make_state_transitions.py ocp_config.py
 solution.pickle: state_transitions.pickle dp.py
 	./dp.py
 
-wat: plot_sol.py
+wat: plot_sol.py solution.pickle
 	./plot_sol.py

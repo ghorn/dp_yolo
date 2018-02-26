@@ -3,8 +3,6 @@
 import numpy as np
 import time
 
-h = 0.05
-
 def cost_function(x, u):
     return x[0]**2 + x[1]**2 + u**2
 
@@ -19,7 +17,7 @@ def ode(x, u):
     return np.array([ddt_q, ddt_w, cost_function(x, u)])
 
 
-def rk4(x0, u):
+def rk4(x0, u, h):
     k1 = ode(x0,            u)
     k2 = ode(x0 + 0.5*h*k1, u)
     k3 = ode(x0 + 0.5*h*k2, u)
