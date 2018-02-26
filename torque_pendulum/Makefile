@@ -8,3 +8,7 @@ solution.pickle: state_transitions.pickle dp.py
 
 wat: plot_sol.py solution.pickle
 	./plot_sol.py
+
+.PHONY: clean
+clean:
+	rm -f *.pickle
