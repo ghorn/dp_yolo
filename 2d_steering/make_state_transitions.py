@@ -11,7 +11,7 @@ Npy2 = 51
 
 Npx = 1 + 2 * Npx2
 Npy = 1 + 2 * Npy2
-Nq = 2*36
+Nq = 36
 Nw = 3
 Nu = 3
 
