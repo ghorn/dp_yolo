@@ -57,7 +57,7 @@ plt.ylabel('count')
 
 
 plt.figure()
-plt.subplot(1, 2, 1)
+plt.subplot(2, 1, 1)
 X, Y = np.meshgrid(qs, ws)
 Z = -Value.T
 S = plt.contourf(np.hstack((X - 2*np.pi, X, X + 2*np.pi)),
@@ -72,7 +72,7 @@ plt.title('Value function')
 
 
 
-plt.subplot(1, 2, 2)
+plt.subplot(2, 1, 2)
 X, Y = np.meshgrid(qs, ws)
 Z = -Value.T
 S = plt.contourf(np.hstack((X - 2*np.pi, X, X + 2*np.pi)),

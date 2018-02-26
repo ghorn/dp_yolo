@@ -44,8 +44,10 @@ def integrate(x0, u, h):
     (next_x, cost) = _rk4(x0, u, h)
     next_x[0] = _wrap_angle(next_x[0])
 
-    too_small = next_x[1] < np.min(x0[1])
-    too_large = next_x[1] > np.max(x0[1])
+    # fudge factor for rounding
+    delta1 = x0[1,0,1,0] - x0[1,0,0,0]
+    too_small = next_x[1] < np.min(x0[1]) - 0.5*delta1
+    too_large = next_x[1] > np.max(x0[1]) + 0.5*delta1
     oob = np.logical_or(too_small, too_large)
     cost[oob]=np.inf
     return (next_x, cost)

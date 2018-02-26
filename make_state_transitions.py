@@ -6,15 +6,32 @@ import time
 
 import ocp_config
 
-Nq = 201
-Nw = 203
-Nu = 51
+Nq2 = 100
+Nw2 = 101
+Nu2 = 25
+
+Nq = 1 + 2 * Nq2
+Nw = 1 + 2 * Nw2
+Nu = 1 + 2 * Nu2
 h = 0.4
 
+# fudge factor to make evenly spaced over angle wraps
+y = float(2*(Nq2)) / float(2*(Nq2) + 1)
+q_min = -y*np.pi
+q_max =  y*np.pi
 
-qs = np.linspace(-np.pi, np.pi, Nq)
-ws = np.linspace(-2*np.pi, 2*np.pi, Nw)
-us = np.linspace(-0.6, 0.6, Nu)
+w_min = -4.
+w_max =  4.
+
+u_min = -0.6
+u_max =  0.6
+
+qs = np.linspace(q_min, q_max, Nq)
+ws = np.linspace(w_min, w_max, Nw)
+us = np.linspace(u_min, u_max, Nu)
+
+# check the fudge factor
+assert abs((qs[0] - qs[-1] + 2*np.pi) - (qs[-1] - qs[-2])) < 1e-9
 
 print("computing state transition tensor")
 Qs, Ws, Us = np.meshgrid(qs, ws, us, indexing='ij')
