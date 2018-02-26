@@ -28,38 +28,37 @@ print("running DP iterations")
 t0 = time.time()
 changes = []
 for k in range(max_iter):
-    changes.append(0)
     sys.stdout.write('iteration %5d...' % k)
     sys.stdout.flush()
-    NewValue = np.copy(Value)
-    for kq in range(Nq):
-        for kw in range(Nw):
-            old_ustar_k = Ustar_k[kq, kw]
-            trial_values = []
-            for ku in range(Nu):
-                this_cost = Costs[kq, kw, ku]
-                q_next = Xnext[0, kq, kw, ku]
-                w_next = Xnext[1, kq, kw, ku]
-                trial_values.append(this_cost + Value[q_next, w_next])
 
-            ustar_k = np.argmin(trial_values)
-            Ustar_k[kq, kw] = ustar_k
-            NewValue[kq, kw] = trial_values[ustar_k]
+    trial_values = np.zeros((Nq, Nw, Nu))
+    for ku in range(Nu):
+        this_cost = Costs[:, :, ku]
+        q_next = Xnext[0, :, :, ku]
+        w_next = Xnext[1, :, :, ku]
 
-            # convergence
-            if old_ustar_k != ustar_k:
-                changes[-1] += 1
+        trial_values[:,:,ku] = this_cost + Value[q_next, w_next]
+
+    Ustar_k_old = np.copy(Ustar_k)
+    Ustar_k = np.argmin(trial_values, axis=2)
+
+    NewValue = np.min(trial_values, axis=2)
+
+    # convergence
+    changes.append(np.sum(Ustar_k != Ustar_k_old))
+
 
     Value = NewValue
     Value -= np.min(Value)
     not_inf = np.logical_not(np.isinf(Value))
     sys.stdout.write('   max value %.2e' % np.max(Value[not_inf]))
     if k > 0:
-        sys.stdout.write('%7d changes (%5.1f %%)\n' % (changes[-1], 100.*float(changes[-1])/float(old_changes)))
+        sys.stdout.write('%7d changes (%5.1f %%)\n' %
+                         (changes[-1], 100.*float(changes[-1])/float(changes[-2])))
     else:
         sys.stdout.write('%7d changes\n' % changes[-1])
     sys.stdout.flush()
-    old_changes = changes[-1]
+
     if changes[-1] == 0:
         break
 t1 = time.time()
