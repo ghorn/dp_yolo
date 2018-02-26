@@ -22,22 +22,22 @@ Nu = len(us)
 
 plt.subplot(2, 2, 1)
 X, Y = np.meshgrid(qs, ws)
-Z = Value
-S = plt.contourf(X, Y, Z.T, 300)
+S = plt.contourf(X, Y, -Value.T, 300)
 cbar = plt.colorbar(S)
-cbar.ax.set_ylabel('yolo')
+cbar.ax.set_ylabel('-Value')
 plt.xlabel('theta [rad]')
 plt.ylabel('omega [rad/s]')
 plt.title('Value function')
 
 
 plt.subplot(2, 2, 2)
-U = Value
+U = np.zeros((Nq, Nw))
 for kq in range(Nq):
     for kw in range(Nw):
         U[kq, kw] = us[Ustar_k[kq, kw]]
-Z = Value
 S = plt.contourf(X, Y, U.T, 300)
+cbar = plt.colorbar(S)
+cbar.ax.set_ylabel('u')
 plt.xlabel('theta [rad]')
 plt.ylabel('omega [rad/s]')
 plt.title('optimal action')
@@ -54,6 +54,37 @@ plt.grid(True)
 plt.title('relative U changes')
 plt.xlabel('iteration')
 plt.ylabel('count')
+
+
+plt.figure()
+plt.subplot(1, 2, 1)
+X, Y = np.meshgrid(qs, ws)
+Z = -Value.T
+S = plt.contourf(np.hstack((X - 2*np.pi, X, X + 2*np.pi)),
+                 np.hstack((Y, Y, Y)),
+                 np.hstack((Z, Z, Z)),
+                 300)
+cbar = plt.colorbar(S)
+cbar.ax.set_ylabel('-Value')
+plt.xlabel('theta [rad]')
+plt.ylabel('omega [rad/s]')
+plt.title('Value function')
+
+
+
+plt.subplot(1, 2, 2)
+X, Y = np.meshgrid(qs, ws)
+Z = -Value.T
+S = plt.contourf(np.hstack((X - 2*np.pi, X, X + 2*np.pi)),
+                 np.hstack((Y, Y, Y)),
+                 np.hstack((U.T, U.T, U.T)),
+                 300)
+cbar = plt.colorbar(S)
+cbar.ax.set_ylabel('u*')
+plt.xlabel('theta [rad]')
+plt.ylabel('omega [rad/s]')
+plt.title('u*(x)')
+
 
 
 plt.show()

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env ipython3
 
 import numpy as np
 import pickle
@@ -38,8 +38,8 @@ for k in range(max_iter):
             trial_values = []
             for ku in range(Nu):
                 this_cost = Costs[kq, kw, ku]
-                q_next = Xnext[kq, kw, ku, 0]
-                w_next = Xnext[kq, kw, ku, 1]
+                q_next = Xnext[0, kq, kw, ku]
+                w_next = Xnext[1, kq, kw, ku]
                 trial_values.append(this_cost + Value[q_next, w_next])
 
             ustar_k = np.argmin(trial_values)
@@ -52,7 +52,8 @@ for k in range(max_iter):
 
     Value = NewValue
     Value -= np.min(Value)
-    sys.stdout.write('   max value %.2e' % np.max(Value))
+    not_inf = np.logical_not(np.isinf(Value))
+    sys.stdout.write('   max value %.2e' % np.max(Value[not_inf]))
     if k > 0:
         sys.stdout.write('%7d changes (%5.1f %%)\n' % (changes[-1], 100.*float(changes[-1])/float(old_changes)))
     else:
