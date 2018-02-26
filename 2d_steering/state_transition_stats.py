@@ -25,9 +25,9 @@ Nw = len(ws)
 Nu = len(us)
 
 print('next omega range effected by u:')
-print(Xnext[1, round(Nq/2), round(Nw/2), :])
+print(Xnext[3, round(Npx/2), round(Npy/2), round(Nq/2), round(Nw/2), :])
 print('next theta range effected by omega:')
-print(Xnext[0, round(Nq/2), :, round(Nu/2)])
+print(Xnext[2, round(Npx/2), round(Npy/2), round(Nq/2), :, round(Nu/2)])
 sys.exit()
 
 

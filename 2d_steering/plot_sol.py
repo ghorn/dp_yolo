@@ -22,7 +22,7 @@ Nw = len(ws)
 Nu = len(us)
 
 Value = sol['Value']
-Ustar_k = sol['Ustar_k']
+Ustar = sol['Ustar']
 changes = sol['changes']
 Xnext = sol['Xnext']
 Costs = sol['Costs']
@@ -35,35 +35,29 @@ def get_values(xk):
 
 def sim(x0):
     route = [x0]
+    uroute = []
 
     k = 1
-    success = False
     while True:
         x = route[-1]
-        trial_values = np.zeros(Nu)
-        for ku in range(Nu):
-            this_cost = Costs[x[0],x[1],x[2],x[3],ku]
-            px_next = Xnext[0, x[0], x[1], x[2], x[3], ku]
-            py_next = Xnext[1, x[0], x[1], x[2], x[3], ku]
-            q_next  = Xnext[2, x[0], x[1], x[2], x[3], ku]
-            w_next  = Xnext[3, x[0], x[1], x[2], x[3], ku]
-        
-            trial_values[ku] = this_cost + Value[px_next, py_next, q_next, w_next]
-        ustar = np.argmin(trial_values, axis=0)
+        #print(Costs[x[0], x[1], x[2], x[3]])
+        ustar = Ustar[x[0], x[1], x[2], x[3]]
         x1 = Xnext[:, x[0], x[1], x[2], x[3], ustar]
         if (x1 == x).all():
             print('converged in %d iterations' % k)
-            success = True
             break
         else:
             route.append(x1)
+            uroute.append(ustar)
 
         # prevent infinite iteration
         if k > 2000:
             print('failed after %d iters iters' % k)
             break
         k += 1
-    return (np.array([get_values(r) for r in route]), success)
+    print('route length %d' % (len(route)))
+    return (np.array([get_values(r) for r in route]),
+            np.array([us[uk] for uk in uroute]))
 
 plt.figure()
 X, Y = np.meshgrid(pxs, pys, indexing='ij')
@@ -76,74 +70,38 @@ cbar.ax.set_ylabel('-Value')
 plt.xlabel('y [m]')
 plt.ylabel('x [m]')
 plt.title('Value function')
+#plt.show()
 
-(xs, success) = sim([round(Npx/2), round(Npy/2), round(Nq/2), 1])
-col = 'g.' if success else 'r.'
-plt.plot(xs[1,:], xs[0,:], col)
+(xs, u) = sim([round(Npx/2*0.25), round(Npy/2*0.25), round(Nq/2*(1-0.1)), 0])
+plt.plot(xs[:,1], xs[:,0], 'r.')
 
-
-
-plt.show()
-
-
-
-
-
-plt.subplot(2, 2, 2)
-U = np.zeros((Nq, Nw))
-for kq in range(Nq):
-    for kw in range(Nw):
-        U[kq, kw] = us[Ustar_k[kq, kw]]
-S = plt.contourf(X, Y, U.T, 300)
-cbar = plt.colorbar(S)
-cbar.ax.set_ylabel('u')
-plt.xlabel('theta [rad]')
-plt.ylabel('omega [rad/s]')
-plt.title('optimal action')
-
-plt.subplot(2, 2, 3)
-plt.hist(U.flatten(), bins=25)
-plt.xlabel('u*')
-plt.ylabel('count')
-plt.title('action historgram')
-
-plt.subplot(2, 2, 4)
-plt.semilogy(changes, '.')
-plt.grid(True)
-plt.title('relative U changes')
-plt.xlabel('iteration')
-plt.ylabel('count')
 
 
 plt.figure()
-plt.subplot(2, 1, 1)
-X, Y = np.meshgrid(qs, ws)
-Z = -Value.T
-S = plt.contourf(np.hstack((X - 2*np.pi, X, X + 2*np.pi)),
-                 np.hstack((Y, Y, Y)),
-                 np.hstack((Z, Z, Z)),
-                 300)
-cbar = plt.colorbar(S)
-cbar.ax.set_ylabel('-Value')
-plt.xlabel('theta [rad]')
-plt.ylabel('omega [rad/s]')
-plt.title('Value function')
+plt.subplot(5, 1, 1)
+plt.plot(xs[:,0], '.')
+plt.ylabel('x')
+plt.grid(True)
 
+plt.subplot(5, 1, 2)
+plt.plot(xs[:,1], '.')
+plt.ylabel('y')
+plt.grid(True)
 
+plt.subplot(5, 1, 3)
+plt.plot(xs[:,2], '.')
+plt.ylabel('q')
+plt.grid(True)
 
-plt.subplot(2, 1, 2)
-X, Y = np.meshgrid(qs, ws)
-Z = -Value.T
-S = plt.contourf(np.hstack((X - 2*np.pi, X, X + 2*np.pi)),
-                 np.hstack((Y, Y, Y)),
-                 np.hstack((U.T, U.T, U.T)),
-                 300)
-cbar = plt.colorbar(S)
-cbar.ax.set_ylabel('u*')
-plt.xlabel('theta [rad]')
-plt.ylabel('omega [rad/s]')
-plt.title('u*(x)')
+plt.subplot(5, 1, 4)
+plt.plot(xs[:,3], '.')
+plt.ylabel('w')
+plt.grid(True)
 
+plt.subplot(5, 1, 5)
+plt.plot(u, '.')
+plt.ylabel('u')
+plt.grid(True)
 
 
 plt.show()

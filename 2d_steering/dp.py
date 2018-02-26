@@ -11,6 +11,7 @@ with open(ipath, 'rb') as f:
     state_transitions = pickle.load(f)
 Xnext = state_transitions['Xnext']
 Costs = state_transitions['Costs']
+terminal_radius = state_transitions['terminal_radius']
 
 pxs = state_transitions['pxs']
 pys = state_transitions['pys']
@@ -25,7 +26,14 @@ Nw = len(ws)
 Nu = len(us)
 
 max_iter = 5000
+
+Pxs, Pys, Qs, Ws = np.meshgrid(pxs, pys, qs, ws, indexing='ij')
+inbnds = Pxs**2 + Pys**2 < terminal_radius**2
+obnds = np.logical_not(inbnds)
+
 Value = np.zeros((Npx, Npy, Nq, Nw))
+Value[np.logical_not(inbnds)] = np.inf
+
 Ustar_k = np.zeros((Npx, Npy, Nq, Nw), dtype=int)
 
 print("running DP iterations")
@@ -83,7 +91,8 @@ else:
 opath = 'solution.pickle'
 if __name__ == '__main__':
     with open(opath, 'wb') as f:
-        sol = {'Value':Value, 'Ustar_k': Ustar_k,
+        sol = {'Value':Value,
+               'Ustar': Ustar_k,
                'Xnext':Xnext,
                'Costs':Costs,
                'pxs':pxs, 'pys':pys, 'qs':qs, 'ws':ws, 'us':us,

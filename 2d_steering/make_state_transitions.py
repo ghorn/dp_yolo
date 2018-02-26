@@ -15,7 +15,7 @@ Nq = 2*36
 Nw = 3
 Nu = 3
 
-h = 0.5#1.0
+h = 1.0
 
 #w_min = -4.
 #w_max =  4.
@@ -27,14 +27,18 @@ pxs = np.linspace(-500.0, 500.0, Npx)
 pys = np.linspace(-500.0, 500.0, Npy)
 qs = np.linspace(-np.pi, np.pi, Nq + 1)[:-1]
 #ws = np.array([-10, -5, 0, -5, 10])#*np.pi/180.0
-ws = np.linspace(10, 10, 3) * np.pi/180.0
+ws = np.linspace(-10, 10, 3) * np.pi/180.0
 us = [-1, 0, 1]
+
+#print(ws[-1]*h)
+#print(qs[-1] - qs[-2])
+#sys.exit(1)
 
 print("computing state transition tensor")
 Pxs, Pys, Qs, Ws, Us = np.meshgrid(pxs, pys, qs, ws, us, indexing='ij')
 
 t0 = time.time()
-(next_x, costs) = ocp_config.integrate(np.array([Pxs, Pys, Qs, Ws]), Us, h)
+(next_x, costs, terminal_radius) = ocp_config.integrate(np.array([Pxs, Pys, Qs, Ws]), Us, h)
 t1 = time.time()
 print("computed state transition tensor in %.2f seconds" % (t1 - t0))
 #print(next_x.shape)
@@ -56,6 +60,7 @@ opath = 'state_transitions.pickle'
 print('pickling to ' + opath)
 ret = {'Xnext':np.array([XsNext, YsNext, QsNext, WsNext]),
        'Costs':costs,
+       'terminal_radius':terminal_radius,
        'pxs':pxs,
        'pys':pys,
        'qs':qs,
